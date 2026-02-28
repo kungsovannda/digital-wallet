@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: gateway
+
+
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+          routes:
+            - id: wallet-command
+              predicates:
+                - Path=/api/v1/wallets/**
+                - Method=POST,PUT,PATCH,DELETE
+              uri: lb://wallet-command
+            - id: wallet-query
+              predicates:
+                - Path=/api/v1/wallets/**
+                - Method=GET
+              uri: lb://wallet-query
+server:
+  port: 8080
