@@ -34,6 +34,7 @@ public class TransactionProjection {
                         transactionView.getTransactionId(),
                         transactionView.getWalletId(),
                         transactionView.getAmount(),
+                        transactionView.getCurrency(),
                         transactionView.getType(),
                         transactionView.getTransferId(),
                         transactionView.getCounterpartWalletId(),
