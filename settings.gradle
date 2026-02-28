@@ -1,0 +1,3 @@
+include ":microservices:wallet-service:command"
+include ":microservices:wallet-service:query"
+include ":microservices:wallet-service:common"
