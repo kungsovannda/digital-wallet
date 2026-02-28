@@ -28,6 +28,7 @@ public class WalletView {
     private WalletStatus status;
     @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal withdrawnToday;
+    @Field(targetType = FieldType.DECIMAL128)
     private BigDecimal dailyWithdrawLimit;
     private LocalDate lastWithdrawalDate;
     private Instant createdAt;
