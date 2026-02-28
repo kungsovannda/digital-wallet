@@ -1,6 +1,6 @@
 spring:
   application:
-    name: wallet-service
+    name: wallet-command
 
   datasource:
     driver-class-name: org.postgresql.Driver
