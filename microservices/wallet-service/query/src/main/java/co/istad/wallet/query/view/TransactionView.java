@@ -1,6 +1,5 @@
 package co.istad.wallet.query.view;
 
-import co.istad.wallet.common.vo.Money;
 import co.istad.wallet.query.vo.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
