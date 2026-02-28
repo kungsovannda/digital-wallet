@@ -28,6 +28,7 @@ dependencies {
     implementation project(":microservices:wallet-service:common")
 
     implementation 'org.axonframework.extensions.kafka:axon-kafka-spring-boot-starter:4.12.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.axonframework.extensions.mongo:axon-mongo-spring-boot-starter:4.12.0'
     implementation 'org.axonframework:axon-spring-boot-starter:4.13.0'
     implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
