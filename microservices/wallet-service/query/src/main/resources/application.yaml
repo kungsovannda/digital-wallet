@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: query
+  mongodb:
+    host: localhost
+    port: 27168
+    password: qwer
+    authentication-database: admin
+    database: wallet
+    username: admin
+
+axon:
+  axonserver:
+    enabled: false
+  kafka:
+    bootstrap-servers:
+      - localhost:29092
+      - localhost:29094
+      - localhost:29096
+    default-topic: local.event
+    consumer:
+      enable-auto-commit: false
+      auto-commit-interval: 3000
+      event-processor-mode: tracking
+      properties:
+        group.id: wallet-query-group
+
+#  serializer:
+#    general: jackson3
+#    events: jackson3
+#    messages: jackson3
+
+server:
+  port: 8081
