@@ -1,6 +1,5 @@
 package co.istad.wallet.query.interfaces.dto;
 
-import co.istad.wallet.common.vo.Money;
 import co.istad.wallet.query.vo.TransactionType;
 
 import java.time.Instant;
