@@ -1,0 +1,20 @@
+services:
+  dw-postgres:
+    image: postgres:17.5-bullseye
+    container_name: dw-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post
+    ports:
+      - "5999:5432"
+    volumes:
+      - dw_postgres_vol:/var/lib/postgresql/data
+    networks:
+      - dw-net
+
+volumes:
+  dw_postgres_vol:
+
+networks:
+  dw-net:
+    external: true
