@@ -20,7 +20,9 @@ public class TransactionView {
     @Id
     private String transactionId;
     private String walletId;
-    private Money amount;
+    @Field(targetType = FieldType.DECIMAL128)
+    private BigDecimal amount;
+    private String currency;
     private TransactionType type;
     private String transferId;
     private String counterpartWalletId;
