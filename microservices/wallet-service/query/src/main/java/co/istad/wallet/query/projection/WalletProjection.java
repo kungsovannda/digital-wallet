@@ -101,7 +101,7 @@ public class WalletProjection {
     public void on(MoneyCreditedEvent event){
         WalletView walletView = walletViewRepository.findById(event.walletId().toString()).orElse(null);
         if(walletView != null){
-            walletView.setBalance(event.balance());
+            walletView.setBalance(event.balance().balance());
             walletViewRepository.save(walletView);
         }
     }
