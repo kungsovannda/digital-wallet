@@ -1,0 +1,33 @@
+package co.istad.wallet.query.view;
+
+import co.istad.wallet.common.vo.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+
+@Data
+@Document("wallets")
+@AllArgsConstructor
+@NoArgsConstructor
+public class WalletView {
+
+    @Id
+    private String walletId;
+    private String ownerId;
+    private Money balance;
+    private WalletType type;
+    private WalletStatus status;
+    private BigDecimal withdrawnToday;
+    private BigDecimal dailyWithdrawLimit;
+    private LocalDate lastWithdrawalDate;
+    private Instant createdAt;
+    private Instant updatedAt;
+
+}
