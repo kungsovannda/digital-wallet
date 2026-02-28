@@ -2,6 +2,7 @@ package co.istad.wallet.query.interfaces.dto;
 
 import co.istad.wallet.query.vo.TransactionType;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 
 public record TransactionResponseDto(
