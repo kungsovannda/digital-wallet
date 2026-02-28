@@ -21,7 +21,9 @@ public class WalletView {
     @Id
     private String walletId;
     private String ownerId;
-    private Money balance;
+    @Field(targetType = FieldType.DECIMAL128)
+    private BigDecimal balance;
+    private String currency;
     private WalletType type;
     private WalletStatus status;
     private BigDecimal withdrawnToday;
