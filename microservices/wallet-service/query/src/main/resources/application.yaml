@@ -1,6 +1,6 @@
 spring:
   application:
-    name: query
+    name: wallet-query
   mongodb:
     host: localhost
     port: 27168
