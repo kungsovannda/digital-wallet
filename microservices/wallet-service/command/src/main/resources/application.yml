@@ -35,6 +35,7 @@ axon:
     general: jackson3
     events: jackson3
     messages: jackson3
+
 server:
   port: 8080
 
