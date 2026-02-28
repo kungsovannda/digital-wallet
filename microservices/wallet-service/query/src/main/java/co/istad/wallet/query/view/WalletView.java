@@ -2,7 +2,6 @@ package co.istad.wallet.query.view;
 
 import co.istad.wallet.common.vo.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
