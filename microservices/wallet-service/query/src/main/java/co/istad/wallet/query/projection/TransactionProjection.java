@@ -48,7 +48,8 @@ public class TransactionProjection {
         TransactionView transactionView = new TransactionView(
                 event.transactionId().id().toString(),
                 event.walletId().id().toString(),
-                event.amount(),
+                event.amount().balance(),
+                event.amount().currency().toString(),
                 TransactionType.DEPOSIT,
                 null,
                 null,
