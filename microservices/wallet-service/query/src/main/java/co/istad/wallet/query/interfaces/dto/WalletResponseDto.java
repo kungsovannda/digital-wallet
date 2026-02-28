@@ -11,7 +11,8 @@ import java.time.LocalDate;
 public record WalletResponseDto(
         String walletId,
         String ownerId,
-        Money balance,
+        BigDecimal balance,
+        String currency,
         WalletType type,
         WalletStatus status,
         BigDecimal withdrawnToday,
