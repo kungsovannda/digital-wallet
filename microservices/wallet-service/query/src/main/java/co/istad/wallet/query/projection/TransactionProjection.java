@@ -96,8 +96,9 @@ public class TransactionProjection {
         TransactionView transactionView = new TransactionView(
                 event.transactionId().id().toString(),
                 event.walletId().id().toString(),
-                event.amount(),
-                TransactionType.DEBIT,
+                event.amount().balance(),
+                event.amount().currency().toString(),
+                TransactionType.CREDIT,
                 event.transferId().toString(),
                 event.fromWalletId().id().toString(),
                 event.timestamp()
