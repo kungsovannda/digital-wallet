@@ -43,7 +43,8 @@ public class WalletProjection {
         WalletView walletView = new WalletView(
                 event.walletId().id().toString(),
                 event.ownerId().id().toString(),
-                event.balance(),
+                event.balance().balance(),
+                event.balance().currency().toString(),
                 event.type(),
                 event.status(),
                 null,
