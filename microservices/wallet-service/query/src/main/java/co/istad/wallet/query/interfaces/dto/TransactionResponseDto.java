@@ -8,7 +8,8 @@ import java.time.Instant;
 public record TransactionResponseDto(
         String transactionId,
         String walletId,
-        Money amount,
+        BigDecimal amount,
+        String currency,
         TransactionType type,
         String transferId,
         String counterpartWalletId,
