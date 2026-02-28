@@ -9,7 +9,7 @@ spring:
     url: jdbc:postgresql://localhost:5999/postgres
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
 
 axon:
   axonserver:
