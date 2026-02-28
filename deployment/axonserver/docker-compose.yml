@@ -1,0 +1,22 @@
+services:
+  dw-axonserver:
+    image: axoniq/axonserver
+    hostname: axonserver
+    volumes:
+      - axonserver-data:/axonserver/data
+      - axonserver-events:/axonserver/events
+      - axonserver-log:/axonserver/log
+    ports:
+      - '8024:8024'
+      - '8124:8124'
+    networks:
+      - dw-net
+
+volumes:
+  axonserver-data:
+  axonserver-events:
+  axonserver-log:
+
+networks:
+  dw-net:
+    external: true
