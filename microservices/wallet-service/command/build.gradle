@@ -18,6 +18,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    set('springCloudVersion', "2025.1.0")
+}
+
 dependencies {
     implementation project(":microservices:wallet-service:common")
     implementation 'org.axonframework.extensions.kafka:axon-kafka-spring-boot-starter:4.12.0'
