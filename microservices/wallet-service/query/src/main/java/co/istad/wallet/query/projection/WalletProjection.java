@@ -79,7 +79,7 @@ public class WalletProjection {
     public void on(MoneyWithdrawnEvent event){
         WalletView walletView = walletViewRepository.findById(event.walletId().toString()).orElse(null);
         if(walletView != null){
-            walletView.setBalance(event.balance());
+            walletView.setBalance(event.balance().balance());
             walletView.setWithdrawnToday(event.withdrawnToday().balance());
             walletView.setLastWithdrawalDate(event.occurredDate());
             walletViewRepository.save(walletView);
