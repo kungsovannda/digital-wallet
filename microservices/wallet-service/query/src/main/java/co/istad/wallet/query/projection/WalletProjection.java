@@ -28,6 +28,7 @@ public class WalletProjection {
                 walletView.getWalletId(),
                 walletView.getOwnerId(),
                 walletView.getBalance(),
+                walletView.getCurrency(),
                 walletView.getType(),
                 walletView.getStatus(),
                 walletView.getWithdrawnToday(),
