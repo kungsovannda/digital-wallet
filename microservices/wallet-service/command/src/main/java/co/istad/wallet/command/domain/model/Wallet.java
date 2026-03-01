@@ -221,5 +221,36 @@ public class Wallet {
     }
 
 
+    private BigDecimal calculateNewWithdrawnToday(LocalDate today, Money amount) {
+        if (lastWithdrawalDate == null || today.isAfter(lastWithdrawalDate)) {
+            return amount.balance();
+        }
+        BigDecimal newWithdrawnToday = withdrawnToday.balance().add(amount.balance());
+        if (newWithdrawnToday.compareTo(dailyWithdrawalLimit.balance()) > 0) {
+            throw new DailyWithdrawalLimitExceededException("Daily limit exceeded.");
+        }
+        return newWithdrawnToday;
+    }
+
+    private void assertWalletIsActive() {
+        if (this.status != WalletStatus.ACTIVE) {
+            throw new WalletNotActiveException("Wallet is not active");
+        }
+    }
+
+    private void assertSufficientBalance(Money amount) {
+        if (this.balance.balance().compareTo(amount.balance()) < 0) {
+            throw new InsufficientBalanceException("Balance is not enough.");
+        }
+    }
+
+    private void assertSameCurrency(Money amount) {
+        if (!this.balance.currency().equals(amount.currency())) {
+            throw new CurrencyMismatchException(
+                    "Cannot operate with currency %s on a %s wallet"
+                            .formatted(amount.currency(), this.balance.currency())
+            );
+        }
+    }
 
 }
