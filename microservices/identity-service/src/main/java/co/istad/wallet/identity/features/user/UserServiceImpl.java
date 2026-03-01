@@ -15,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 
 @Service
@@ -54,6 +56,7 @@ public class UserServiceImpl implements UserService {
                 .accountNonLocked(true)
                 .accountNonExpired(true)
                 .credentialsNonExpired(true)
+                .dob(LocalDate.of(2000, Month.APRIL,10))
                 .roles(roles)
                 .build();
 

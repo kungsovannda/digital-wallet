@@ -6,7 +6,9 @@ import org.axonframework.extensions.kafka.eventhandling.consumer.streamable.Stre
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableAsync;
 
+@EnableAsync
 @SpringBootApplication
 @RequiredArgsConstructor
 public class NotificationServiceApplication {
@@ -17,7 +19,7 @@ public class NotificationServiceApplication {
 
     @Autowired
     public void configure(EventProcessingConfigurer configurer,
-                          StreamableKafkaMessageSource<String, byte[]> kafkaMessageSource){
+            StreamableKafkaMessageSource<String, byte[]> kafkaMessageSource) {
         configurer.registerTrackingEventProcessor("notification-processing", c -> kafkaMessageSource);
     }
 }
