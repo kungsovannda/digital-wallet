@@ -1,4 +1,4 @@
-package co.istad.gateway;
+package co.istad.wallet.gateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
