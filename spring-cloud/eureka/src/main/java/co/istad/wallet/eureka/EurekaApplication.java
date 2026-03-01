@@ -1,4 +1,4 @@
-package co.istad.eureka;
+package co.istad.wallet.eureka;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
