@@ -1,7 +1,9 @@
 package co.istad.wallet.command.domain.exception;
 
-public class WalletNotActiveException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class WalletNotActiveException extends WalletException {
     public WalletNotActiveException(String message) {
-        super(message);
+        super(message, HttpStatus.CONFLICT);
     }
 }
