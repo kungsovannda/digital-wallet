@@ -137,13 +137,9 @@ public class Wallet {
 
     @CommandHandler
     public void handle(TransferMoneyCommand cmd){
-        if (this.status != WalletStatus.ACTIVE) {
-            throw new WalletNotActiveException("Wallet is not active");
-        }
-
-        if (this.balance.balance().compareTo(cmd.amount().balance()) < 0) {
-            throw new InsufficientBalanceException("Balance is not enough.");
-        }
+        assertWalletIsActive();
+        assertSufficientBalance(cmd.amount());
+        assertSameCurrency(cmd.amount());
 
         LocalDate today = LocalDate.now();
 
