@@ -209,10 +209,10 @@ public class Wallet {
 
     @CommandHandler
     public void handle(FreezeWalletCommand cmd){
-        AggregateLifecycle.apply(new WalletFrozenEvent(
-                cmd.walletId(),
-                LocalDate.now()
-        ));
+        if (this.status == WalletStatus.FROZEN) {
+            throw new WalletAlreadyFrozenException("Wallet is already frozen.");
+        }
+        AggregateLifecycle.apply(new WalletFrozenEvent(cmd.walletId(), LocalDate.now()));
     }
 
     @EventSourcingHandler
