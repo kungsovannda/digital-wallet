@@ -66,10 +66,8 @@ public class Wallet {
 
     @CommandHandler
     public void handle(DepositMoneyCommand cmd){
-        log.info("DepositMoneyCommand: {}", cmd);
-        if (this.status != WalletStatus.ACTIVE) {
-            throw new WalletNotActiveException("Wallet is not active");
-        }
+        assertWalletIsActive();
+        assertSameCurrency(cmd.amount());
 
         Money newBalance = new Money(
                 this.balance.balance().add(cmd.amount().balance()),
