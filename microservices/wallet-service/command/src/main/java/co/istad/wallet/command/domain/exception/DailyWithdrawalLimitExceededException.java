@@ -1,7 +1,9 @@
 package co.istad.wallet.command.domain.exception;
 
-public class DailyWithdrawalLimitExceededException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class DailyWithdrawalLimitExceededException extends WalletException {
     public DailyWithdrawalLimitExceededException(String message) {
-        super(message);
+        super(message, HttpStatus.UNPROCESSABLE_CONTENT);
     }
 }
