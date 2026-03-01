@@ -76,7 +76,7 @@ public class Wallet {
 
         AggregateLifecycle.apply(
                 new MoneyDepositedEvent(
-                        new TransactionId(UUID.randomUUID()),
+                        cmd.transactionId(),
                         cmd.walletId(),
                         cmd.amount(),
                         newBalance,
