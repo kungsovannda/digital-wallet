@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: onesignal-server-application-demo
+
+# mail cofig
+  mail:
+    host: smtp.gmail.com
+    username: kungsovannda@gmail.com
+    password: ${APP_PASSWORD}
+    port: 587
+    protocol: smtp
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+
+onesignal:
+  app-id: ${APP_ID}
+  rest-api-key: ${REST_API_KEY}

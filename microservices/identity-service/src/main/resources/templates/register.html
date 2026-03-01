@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="h-screen overflow-hidden bg-gray-50">
+
+<div class="h-full flex">
+
+    <!-- Left: Illustration / marketing panel (hidden on phones) -->
+    <aside class="hidden md:flex md:w-1/2 items-center justify-center bg-gradient-to-br from-white to-gray-100 p-8">
+        <div class="max-w-md space-y-6">
+            <div class="flex items-center justify-center">
+                <!-- Replace with a real illustrator or image if you want -->
+                <img th:src="@{images/secure-bro.svg}" alt="secure-bro">
+            </div>
+
+            <div>
+                <h2 class="text-2xl font-semibold text-gray-900">Create your account</h2>
+                <p class="mt-1 text-sm text-gray-600">
+                    Join us — create an account to start using the app and access all features.
+                </p>
+            </div>
+
+            <ul class="mt-4 space-y-2 text-sm text-gray-700">
+                <li class="flex items-start"><span class="mr-2">•</span> Quick signup</li>
+                <li class="flex items-start"><span class="mr-2">•</span> Secure by default</li>
+                <li class="flex items-start"><span class="mr-2">•</span> Continue with the same UI</li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Right: Form panel -->
+    <main class="flex-1 flex items-center justify-center p-6">
+        <div class="w-full max-w-md space-y-6">
+
+            <!-- Register Card -->
+            <div class="p-6">
+
+                <!-- Header -->
+                <div class="mb-6">
+                    <h1 class="text-2xl font-semibold text-gray-900 mb-1">
+                        Create your account
+                    </h1>
+                    <p class="text-xs text-gray-600">
+                        Register to start using the app
+                    </p>
+                </div>
+
+                <!-- Register Form -->
+                <form th:action="@{/register}" method="post" th:object="${userForm}" class="space-y-3">
+
+                    <!-- Error Message (if any validation errors) -->
+                    <div th:if="${#fields.hasErrors('*')}" class="p-3 rounded-lg bg-red-50 border border-red-200">
+                        <div class="flex items-start">
+                            <svg class="w-4 h-4 text-red-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <p class="text-xs font-medium text-red-800">
+                                    Please fix the errors below
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CSRF Token (Required for Spring Security) -->
+                    <!--            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>-->
+
+                    <div class="flex flex-col md:flex-row gap-3">
+                        <div class="flex-1">
+                            <label for="givenName" class="block text-xs font-medium text-gray-700 mb-1.5">
+                                First Name
+                            </label>
+                            <input
+                                    type="text"
+                                    id="givenName"
+                                    th:field="*{givenName}"
+                                    required
+                                    class="block w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-colors"
+                                    placeholder="First name"
+                            />
+                            <div th:if="${#fields.hasErrors('givenName')}" th:errors="*{givenName}" class="text-xs text-red-600 mt-1"></div>
+                        </div>
+
+                        <!-- Family Name Field -->
+                        <div class="flex-1">
+                            <label for="familyName" class="block text-xs font-medium text-gray-700 mb-1.5">
+                                Last Name
+                            </label>
+                            <input
+                                    type="text"
+                                    id="familyName"
+                                    th:field="*{familyName}"
+                                    required
+                                    class="block w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-colors"
+                                    placeholder="Last name"
+                            />
+                            <div th:if="${#fields.hasErrors('familyName')}" th:errors="*{familyName}" class="text-xs text-red-600 mt-1"></div>
+                        </div>
+                    </div>
+
+
+                    <!-- Username Field -->
+                    <div>
+                        <label for="username" class="block text-xs font-medium text-gray-700 mb-1.5">
+                            Username
+                        </label>
+                        <input
+                                type="text"
+                                id="username"
+                                th:field="*{username}"
+                                required
+                                autofocus
+                                class="block w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-colors"
+                                placeholder="username"
+                        />
+                        <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}" class="text-xs text-red-600 mt-1"></div>
+                    </div>
+
+                    <!-- Email Field -->
+                    <div>
+                        <label for="email" class="block text-xs font-medium text-gray-700 mb-1.5">
+                            Email
+                        </label>
+                        <input
+                                type="email"
+                                id="email"
+                                th:field="*{email}"
+                                required
+                                class="block w-full px-3 py-2.5 text-sm rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent transition-colors"
+                                placeholder="email@example.com"
+                        />
+                        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-xs text-red-600 mt-1"></div>
+                    </div>
+
+                    <!-- Password Field -->
+                    <div>
+                        <label for="password" class="block text-xs font-medium text-gray-700 mb-1.5">
+                            Password
+                        </label>
+                        <div class="relative block w-full rounded-lg border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-gray-400 focus-within:border-transparent transition-colors">
+                            <input
+                                    type="password"
+                                    id="password"
+                                    th:field="*{password}"
+                                    required
+                                    class="w-full px-3 py-2.5 pr-10 text-sm bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none border-0"
+                                    placeholder="********"
+                            />
+                            <button
+                                    type="button"
+                                    onclick="togglePassword('password', 'eye-icon-password')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                            >
+                                <svg id="eye-icon-password" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}" class="text-xs text-red-600 mt-1"></div>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div>
+                        <label for="confirmPassword" class="block text-xs font-medium text-gray-700 mb-1.5">
+                            Confirm Password
+                        </label>
+                        <div class="relative block w-full rounded-lg border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-gray-400 focus-within:border-transparent transition-colors">
+                            <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    th:field="*{confirmPassword}"
+                                    required
+                                    class="w-full px-3 py-2.5 pr-10 text-sm bg-transparent text-gray-900 placeholder-gray-400 focus:outline-none border-0"
+                                    placeholder="********"
+                            />
+                            <button
+                                    type="button"
+                                    onclick="togglePassword('confirmPassword', 'eye-icon-confirm')"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                            >
+                                <svg id="eye-icon-confirm" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                        <div th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}" class="text-xs text-red-600 mt-1"></div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button
+                            style="margin-top: 16px"
+                            type="submit"
+                            class="w-full py-2.5 px-4 text-sm rounded-lg font-semibold text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 transition-colors shadow-sm"
+                    >
+                        Create account
+                    </button>
+
+                </form>
+
+                <!-- Link to Login -->
+                <p class="text-center text-xs text-gray-600 mt-4">
+                    Already have an account? <a href="/login" class="text-gray-900 font-medium hover:underline">Sign in</a>
+                </p>
+
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<script>
+    function togglePassword(inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const eyeIcon = document.getElementById(iconId);
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+            // Change to eye-slash icon
+            eyeIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+        `;
+        } else {
+            passwordInput.type = "password";
+            // Change back to eye icon
+            eyeIcon.innerHTML = `
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        `;
+        }
+    }
+</script>
+
+</body>
+</html>

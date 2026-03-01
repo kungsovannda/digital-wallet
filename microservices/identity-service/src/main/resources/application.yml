@@ -1,0 +1,54 @@
+spring:
+  application:
+    name: identity-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5998/postgres
+    username: postgres
+    password: post
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  security:
+    oauth2:
+      authorizationserver:
+        issuer: http://localhost:9090
+server:
+  port: 9090
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2.server.authorization: TRACE
+    org.springframework.security.oauth2.server.authorization.oidc.authentication: TRACE
+
+
+axon:
+  axonserver:
+    enabled: false
+
+  kafka:
+    bootstrap-servers:
+      - localhost:29092
+      - localhost:29094
+      - localhost:29096
+    default-topic: local.event
+    producer:
+      retries: 0
+      event-processor-mode: subscribing
+    fetcher:
+      poll-timeout: 3000
+    consumer:
+      enable-auto-commit: true
+      auto-commit-interval: 3000
+      event-processor-mode: tracking
+
+  serializer:
+    general: jackson3
+    events: jackson3
+    messages: jackson3
