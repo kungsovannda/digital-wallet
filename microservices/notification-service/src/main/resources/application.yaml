@@ -1,8 +1,16 @@
 spring:
   application:
-    name: onesignal-server-application-demo
+    name: notification-service
 
-# mail cofig
+  datasource:
+    url: jdbc:postgresql://localhost:5997/postgres
+    username: postgres
+    password: post
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
   mail:
     host: smtp.gmail.com
     username: kungsovannda@gmail.com
@@ -12,8 +20,26 @@ spring:
     properties:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
 
 
-onesignal:
-  app-id: ${APP_ID}
-  rest-api-key: ${REST_API_KEY}
+axon:
+  axonserver:
+    enabled: false
+  kafka:
+    bootstrap-servers:
+      - localhost:29092
+      - localhost:29094
+      - localhost:29096
+    default-topic: local.event
+    consumer:
+      enable-auto-commit: false
+      auto-commit-interval: 3000
+      event-processor-mode: tracking
+      properties:
+        group.id: wallet-query-group
+
+server:
+  port: 8083
