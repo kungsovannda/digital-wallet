@@ -23,25 +23,4 @@ public class WalletCommandApplication {
         SpringApplication.run(WalletCommandApplication.class, args);
     }
 
-    @Bean
-    public CommandLineRunner runner(){
-        return args -> {
-            WalletId walletId = new WalletId(UUID.randomUUID());
-            commandGateway.sendAndWait(
-                    new CreateWalletCommand(
-                            walletId,
-                            new UserId(UUID.randomUUID()),
-                            new Money(new BigDecimal("5000"), MoneyCurrency.KHR),
-                            WalletType.STANDARD
-                    )
-            );
-            commandGateway.sendAndWait(
-                    new DepositMoneyCommand(
-                            walletId,
-                            new Money(new BigDecimal("100"), MoneyCurrency.KHR)
-                    )
-            );
-        };
-    }
-
 }
