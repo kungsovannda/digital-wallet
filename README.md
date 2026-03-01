@@ -1,98 +1,83 @@
-# Axon Framework + Spring Boot 4: DDD, CQRS & Event Sourcing
+# Digital Wallet: Axon Framework Microservices
 
-> A reference implementation of a **Digital Wallet** demonstrating the integration of **Axon Framework** with **Spring Boot 4**, using **PostgreSQL** as the event store and **Apache Kafka** for distributed messaging. This project serves as a blueprint for implementing scalable, event-driven microservices with a strong focus on domain-centric design and modern security standards.
+A modern, cloud-native Digital Wallet implementation demonstrating the power of **Domain-Driven Design (DDD)**, **CQRS**, and **Event Sourcing** using the **Axon Framework**. This project serves as a reference architecture for building scalable, resilient, and auditable financial systems.
 
----
+## �️ Architectural Overview
 
-## 🏛️ Architectural Foundation
+The project is built on the principle of **CQRS (Command Query Responsibility Segregation)**, separating the "Write" operations from the "Read" operations to allow independent scaling and optimized data models.
 
-This project is built on modern distributed system patterns:
+*   **Command Side (Write)**: Powered by **PostgreSQL** (Event Store). Every state change is stored as a sequence of events, ensuring a 100% accurate audit log.
+*   **Query Side (Read)**: Powered by **MongoDB**. Optimized projections are updated asynchronously to provide high-performance data retrieval.
+*   **Event Bus**: **Kafka** is used as the distributed event backbone, ensuring reliable communication between microservices.
+*   **Service Discovery & Gateway**: **Spring Cloud Eureka** handles service registration, while **Spring Cloud Gateway** provides a unified API entry point.
 
-- **Domain-Driven Design (DDD)**: Business logic lives in Aggregates that define the consistency boundaries.
-- **CQRS**: Complete separation of command processing and query reporting.
-- **Event Sourcing**: The source of truth is the immutable sequence of domain events persisted in PostgreSQL.
-- **Database per Service**: Every microservice owns its private database (PostgreSQL or MongoDB), ensuring strict service isolation.
-- **Security-First Architecture**: Implements **OAuth2 & OpenID Connect (OIDC)** using **Spring Authorization Server**.
-- **Distributed Event Bus**: **Apache Kafka** handles the distribution of events across service boundaries.
+## 🛠️ Technology Stack
 
----
-
-## 🎓 Educational Focus
-
-This project is designed as a learning resource. Key implementation details to explore:
-
-1.  **Aggregate Modeling**: See `wallet-service/command` for how to implement state-changing logic and event application using Axon's `@Aggregate`.
-2.  **Service Isolation**: Notice the `deployment/postgres` configuration where separate database containers are used for each service to demonstrate the **Database per Service** pattern.
-3.  **Cross-Service Communication**: Trace how an event published in the `command` side travels through **Kafka** to reach the `query` side and the `notification-service`.
-4.  **JWT Security**: Explore how the `gateway` and microservices act as Resource Servers, validating tokens issued by the `identity-service`.
-5.  **Event Store Strategy**: Observe the use of **PostgreSQL** as an Event Store, a common alternative to Axon Server for teams already comfortable with RDBMS.
+*   **Core**: Java 21, Spring Boot 4.0.x
+*   **Orchestration**: Axon Framework 4.13.0
+*   **Message Broker**: Apache Kafka
+*   **Security**: OAuth2/OIDC (Spring Authorization Server)
+*   **Databases**: PostgreSQL (Command), MongoDB (Query)
+*   **Infrastructure**: Spring Cloud Gateway, Eureka, Docker Compose
 
 ---
 
-## 🏗️ Messaging, Persistence & Security
+## 📡 API Reference
 
-### 1. Persistence (Event Store)
-The **Command Side** uses **PostgreSQL** as the primary Event Store. This ensures ACID compliance for event persistence during aggregate state changes.
+All requests should be directed through the Gateway at **`http://localhost:8080`**.
 
-### 2. Messaging (Event Bus)
-**Apache Kafka** acts as the backbone for cross-service communication. Events are automatically streamed to Kafka topics via the Axon Kafka Extension.
+### 🔐 Identity & Auth (9090)
+| Method | Endpoint | Description |
+|:--- |:--- |:--- |
+| `GET` | `/login` | Default login page |
+| `GET` | `/register` | User registration page |
+| `POST` | `/register` | Handle new user registration |
+| `GET` | `/api/v1/users` | Retrieve authenticated user details |
 
-### 3. Security (OAuth2 / OIDC)
-The `identity-service` acts as a **Spring Authorization Server**. All other microservices (Wallet, Notification) act as **OAuth2 Resource Servers**.
+### 💳 Wallet Commands (8081)
+| Method | Endpoint | Command Triggered |
+|:--- |:--- |:--- |
+| `POST` | `/api/v1/wallets` | `CreateWalletCommand` |
+| `PUT` | `/api/v1/wallets/{id}/deposit` | `DepositMoneyCommand` |
+| `PUT` | `/api/v1/wallets/{id}/withdraw` | `WithdrawMoneyCommand` |
+| `PUT` | `/api/v1/wallets/{id}/transfer` | `TransferMoneyCommand` |
+| `PUT` | `/api/v1/wallets/{id}/freeze` | `FreezeWalletCommand` |
 
-### 4. Service Isolation (Database per Service)
-*   **Identity Service**: `dw-identity` (Postgres)
-*   **Wallet Command**: `dw-postgres` (Postgres Event Store)
-*   **Wallet Query**: `mongodb-dw` (MongoDB Read Models)
-*   **Notification Service**: `dw-notification` (Postgres)
-
----
-
-## 🗂️ Project Structure
-
-```text
-digital-wallet/
-├── common/                # Shared Language (Events, DTOs, Value Objects)
-├── microservices/
-│   ├── identity-service/  # OAuth2 Authorization Server (Support for JWT/OIDC)
-│   ├── wallet-service/    # Core Domain Logic
-│   │   ├── command/       # Write Side: Aggregates (Database: Postgres Event Store)
-│   │   └── query/         # Read Side: Projections (Database: MongoDB Read Model)
-│   └── notification-service/ # Integration Service (Resource Server)
-├── spring-cloud/
-│   ├── eureka/            # Service Discovery
-│   └── gateway/           # Edge Service (API Gateway & Security Filter)
-└── deployment/            # Infrastructure (Docker Compose)
-    ├── postgres/          # Separate Postgres containers for service isolation
-    ├── kafka/             # Distributed Message Broker (Kraft mode)
-    ├── mongodb/           # Document Store for Read Models
-    └── axonserver/        # (Testing Only) Local Command/Query Bus
-```
+### 🔍 Wallet Queries (8082)
+| Method | Endpoint | Query Triggered |
+|:--- |:--- |:--- |
+| `GET` | `/api/v1/wallets/{id}` | `GetWalletQuery` |
+| `GET` | `/api/v1/wallets/my-wallets` | `GetUserWalletsQuery` |
+| `GET` | `/api/v1/wallets/status` | `GetWalletsByStatusQuery` |
+| `GET` | `/api/v1/wallets/{id}/transactions`| `GetTransactionHistoryQuery` |
+| `GET` | `/api/v1/wallets/transactions/{tid}`| `GetTransactionByIdQuery` |
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Start Infrastructure
-To spin up all required infrastructure components (PostgreSQL, Kafka, MongoDB, and Axon Server), simply run:
+### Prerequisites
+*   Docker & Docker Desktop
+*   JDK 21
+*   Gradle
+
+### Running the Infrastructure
+The project uses a "Database per Service" approach. All infrastructure components (Postgres, Mongo, Kafka, Kafka-UI) can be started via:
 
 ```bash
 docker-compose up -d
 ```
 
-### 2. Build and Run
-```bash
-./gradlew clean build
-```
+### Accessing Tools
+*   **Eureka Dashboard**: `http://localhost:8761`
+*   **Kafka UI**: `http://localhost:18000` (Admin/qwer)
+*   **Identity Server**: `http://localhost:9090`
 
-Run the microservices in the following order:
-1. **Eureka**: `spring-cloud/eureka`
-2. **Gateway**: `spring-cloud/gateway`
-3. **Identity**: `microservices/identity-service`
-4. **Wallet**: `command` and `query` modules.
+## 🛡️ Security Configuration
+Access to wallet endpoints requires a valid JWT token issued by the Identity Service.
+*   **Issuer**: `http://localhost:9090`
+*   **Client ID**: `dw-client`
+*   **Client Secret**: `secret`
 
----
-
-## 👤 Author
-**Kung Sovannda**
-- GitHub: [@kungsovannda](https://github.com/kungsovannda)
+## 📧 Notifications
+The `notification-service` listens to events emitted by the wallet aggregates and automatically dispatches transactional emails (Registration, Deposits, etc.) using high-quality HTML templates.

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/wallets")
@@ -22,8 +23,8 @@ public class TransactionController {
     private final QueryGateway queryGateway;
 
     @GetMapping("/{walletId}/transactions")
-    public List<TransactionResponseDto> getTransactionHistory(@PathVariable String walletId) {
-        GetTransactionHistoryQuery getTransactionHistoryQuery = new GetTransactionHistoryQuery(walletId);
+    public List<TransactionResponseDto> getTransactionHistory(@PathVariable UUID walletId) {
+        GetTransactionHistoryQuery getTransactionHistoryQuery = new GetTransactionHistoryQuery(new WalletId(walletId));
         return queryGateway
                 .query(getTransactionHistoryQuery, ResponseTypes.multipleInstancesOf(TransactionResponseDto.class))
                 .join();

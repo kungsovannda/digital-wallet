@@ -62,7 +62,7 @@ public class Wallet {
     }
 
     @CommandHandler
-    public void handle(DepositMoneyCommand cmd){
+    public WalletId handle(DepositMoneyCommand cmd){
         assertWalletIsActive();
         assertSameCurrency(cmd.amount());
 
@@ -81,6 +81,8 @@ public class Wallet {
                         Instant.now()
                 )
         );
+
+        return cmd.walletId();
     }
 
     @EventSourcingHandler
@@ -89,7 +91,7 @@ public class Wallet {
     }
 
     @CommandHandler
-    public void handle(WithdrawMoneyCommand cmd) {
+    public WalletId handle(WithdrawMoneyCommand cmd) {
         assertWalletIsActive();
         assertSufficientBalance(cmd.amount());
         assertSameCurrency(cmd.amount());
@@ -109,6 +111,8 @@ public class Wallet {
                         Instant.now()
                 )
         );
+
+        return cmd.walletId();
     }
 
     @EventSourcingHandler
@@ -119,7 +123,7 @@ public class Wallet {
     }
 
     @CommandHandler
-    public void handle(TransferMoneyCommand cmd){
+    public WalletId handle(TransferMoneyCommand cmd){
         assertWalletIsActive();
         assertSufficientBalance(cmd.amount());
         assertSameCurrency(cmd.amount());
@@ -142,6 +146,7 @@ public class Wallet {
                 )
         );
 
+        return cmd.walletId();
     }
 
     @EventSourcingHandler
@@ -152,7 +157,7 @@ public class Wallet {
     }
 
     @CommandHandler
-    public void handle(CreditMoneyCommand cmd){
+    public WalletId handle(CreditMoneyCommand cmd){
         assertWalletIsActive();
         assertSameCurrency(cmd.amount());
 
@@ -170,6 +175,8 @@ public class Wallet {
                         Instant.now()
                 )
         );
+
+        return walletId;
     }
 
     @EventSourcingHandler
@@ -178,11 +185,12 @@ public class Wallet {
     }
 
     @CommandHandler
-    public void handle(FreezeWalletCommand cmd){
+    public WalletId handle(FreezeWalletCommand cmd){
         if (this.status == WalletStatus.FROZEN) {
             throw new WalletAlreadyFrozenException("Wallet is already frozen.");
         }
         AggregateLifecycle.apply(new WalletFrozenEvent(cmd.walletId(), LocalDate.now()));
+        return cmd.walletId();
     }
 
     @EventSourcingHandler

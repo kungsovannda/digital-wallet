@@ -28,59 +28,69 @@ public class WalletController {
         private final CommandGateway commandGateway;
 
         @PostMapping
-        public ResponseEntity<?> createWallet(@AuthenticationPrincipal Jwt jwt,
+        public ResponseEntity<WalletId> createWallet(@AuthenticationPrincipal Jwt jwt,
                         @Valid @RequestBody CreateWalletRequestDto createWalletRequestDto) {
                 log.info("Create wallet user: {}", jwt.getClaims());
-                commandGateway.sendAndWait(
+                WalletId result = commandGateway.sendAndWait(
                                 new CreateWalletCommand(
                                                 new WalletId(UUID.randomUUID()),
                                                 extractUserId(jwt),
                                                 createWalletRequestDto.balance(),
                                                 createWalletRequestDto.type()));
-                return new ResponseEntity<>(HttpStatus.CREATED);
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(result);
         }
 
         @PutMapping("/{walletId}/deposit")
         public ResponseEntity<?> depositMoney(@PathVariable UUID walletId,
                         @Valid @RequestBody DepositMoneyRequestDto depositMoneyRequestDto) {
-                commandGateway.sendAndWait(
+                WalletId result = commandGateway.sendAndWait(
                                 new DepositMoneyCommand(
                                                 new WalletId(walletId),
                                                 new TransactionId(UUID.randomUUID()),
                                                 depositMoneyRequestDto.amount()));
-                return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                return ResponseEntity
+                        .status(HttpStatus.ACCEPTED)
+                        .body(result);
         }
 
         @PutMapping("/{walletId}/withdraw")
-        public ResponseEntity<?> withdrawMoney(@PathVariable UUID walletId,
+        public ResponseEntity<WalletId> withdrawMoney(@PathVariable UUID walletId,
                         @Valid @RequestBody WithdrawMoneyRequestDto withdrawMoneyRequestDto) {
-                commandGateway.sendAndWait(
+                WalletId result = commandGateway.sendAndWait(
                                 new WithdrawMoneyCommand(
                                                 new WalletId(walletId),
                                                 new TransactionId(UUID.randomUUID()),
                                                 withdrawMoneyRequestDto.amount()));
-                return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                return ResponseEntity
+                        .status(HttpStatus.ACCEPTED)
+                        .body(result);
         }
 
         @PutMapping("/{walletId}/transfer")
-        public ResponseEntity<?> transferMoney(@PathVariable UUID walletId,
+        public ResponseEntity<WalletId> transferMoney(@PathVariable UUID walletId,
                         @Valid @RequestBody TransferMoneyRequestDto transferMoneyRequestDto) {
-                commandGateway.sendAndWait(
+                WalletId result = commandGateway.sendAndWait(
                                 new TransferMoneyCommand(
                                                 new WalletId(walletId),
                                                 new TransactionId(UUID.randomUUID()),
                                                 new TransferId(UUID.randomUUID()),
                                                 transferMoneyRequestDto.amount(),
                                                 transferMoneyRequestDto.toWalletId()));
-                return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                return ResponseEntity
+                        .status(HttpStatus.ACCEPTED)
+                        .body(result);
         }
 
         @PutMapping("/{walletId}/freeze")
-        public ResponseEntity<?> freezeWallet(@PathVariable UUID walletId) {
-                commandGateway.sendAndWait(
+        public ResponseEntity<WalletId> freezeWallet(@PathVariable UUID walletId) {
+                WalletId result = commandGateway.sendAndWait(
                                 new FreezeWalletCommand(
                                                 new WalletId(walletId)));
-                return new ResponseEntity<>(HttpStatus.ACCEPTED);
+                return ResponseEntity
+                        .status(HttpStatus.ACCEPTED)
+                        .body(result);
         }
 
         private UserId extractUserId(Jwt jwt) {
