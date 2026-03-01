@@ -184,6 +184,9 @@ public class Wallet {
 
     @CommandHandler
     public void handle(CreditMoneyCommand cmd){
+        assertWalletIsActive();
+        assertSameCurrency(cmd.amount());
+
         BigDecimal newBalance = balance.balance().add(cmd.amount().balance());
         AggregateLifecycle.apply(
                 new MoneyCreditedEvent(
