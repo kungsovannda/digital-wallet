@@ -1,4 +1,13 @@
 package co.istad.wallet.common.event;
 
-public record UserCreatedEvent() {
+import co.istad.wallet.common.vo.UserId;
+
+public record UserCreatedEvent(
+        UserId userId,
+        String username,
+        String familyName,
+        String givenName,
+        String gender,
+        String email
+) {
 }
