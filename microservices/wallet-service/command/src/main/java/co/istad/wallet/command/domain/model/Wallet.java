@@ -161,7 +161,7 @@ public class Wallet {
 
         AggregateLifecycle.apply(
                 new MoneyDebitedEvent(
-                        new TransactionId(UUID.randomUUID()),
+                        cmd.transactionId(),
                         cmd.walletId(),
                         new TransferId(UUID.randomUUID()),
                         cmd.toWalletId(),
