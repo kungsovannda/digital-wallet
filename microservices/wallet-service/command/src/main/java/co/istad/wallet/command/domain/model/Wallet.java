@@ -1,9 +1,7 @@
 package co.istad.wallet.command.domain.model;
 
 import co.istad.wallet.command.domain.command.*;
-import co.istad.wallet.command.domain.exception.DailyWithdrawalLimitExceededException;
-import co.istad.wallet.command.domain.exception.InsufficientBalanceException;
-import co.istad.wallet.command.domain.exception.WalletNotActiveException;
+import co.istad.wallet.command.domain.exception.*;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +16,6 @@ import co.istad.wallet.common.event.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.UUID;
 
 @Aggregate
 @NoArgsConstructor
@@ -98,26 +95,12 @@ public class Wallet {
         assertSameCurrency(cmd.amount());
 
         LocalDate today = LocalDate.now();
-
-        BigDecimal newWithdrawnToday;
-
-        if (lastWithdrawalDate == null || today.isAfter(lastWithdrawalDate)) {
-            newWithdrawnToday = cmd.amount().balance();
-        } else {
-            newWithdrawnToday =
-                    withdrawnToday.balance().add(cmd.amount().balance());
-
-            if (newWithdrawnToday.compareTo(dailyWithdrawalLimit.balance()) > 0) {
-                throw new DailyWithdrawalLimitExceededException("Daily limit exceeded.");
-            }
-        }
-
-        BigDecimal newBalance =
-                this.balance.balance().subtract(cmd.amount().balance());
+        BigDecimal newWithdrawnToday = calculateNewWithdrawnToday(today, cmd.amount());
+        BigDecimal newBalance = this.balance.balance().subtract(cmd.amount().balance());
 
         AggregateLifecycle.apply(
                 new MoneyWithdrawnEvent(
-                        new TransactionId(UUID.randomUUID()),
+                        cmd.transactionId(),
                         cmd.walletId(),
                         cmd.amount(),
                         new Money(newBalance, cmd.amount().currency()),
@@ -142,22 +125,8 @@ public class Wallet {
         assertSameCurrency(cmd.amount());
 
         LocalDate today = LocalDate.now();
-
-        BigDecimal newWithdrawnToday;
-
-        if (lastWithdrawalDate == null || today.isAfter(lastWithdrawalDate)) {
-            newWithdrawnToday = cmd.amount().balance();
-        } else {
-            newWithdrawnToday =
-                    withdrawnToday.balance().add(cmd.amount().balance());
-
-            if (newWithdrawnToday.compareTo(dailyWithdrawalLimit.balance()) > 0) {
-                throw new DailyWithdrawalLimitExceededException("Daily limit exceeded.");
-            }
-        }
-
-        BigDecimal newBalance =
-                this.balance.balance().subtract(cmd.amount().balance());
+        BigDecimal newWithdrawnToday = calculateNewWithdrawnToday(today, cmd.amount());
+        BigDecimal newBalance = this.balance.balance().subtract(cmd.amount().balance());
 
         AggregateLifecycle.apply(
                 new MoneyDebitedEvent(
@@ -188,9 +157,10 @@ public class Wallet {
         assertSameCurrency(cmd.amount());
 
         BigDecimal newBalance = balance.balance().add(cmd.amount().balance());
+
         AggregateLifecycle.apply(
                 new MoneyCreditedEvent(
-                        new TransactionId(UUID.randomUUID()),
+                        cmd.transactionId(),
                         cmd.walletId(),
                         cmd.fromWalletId(),
                         cmd.transferId(),
