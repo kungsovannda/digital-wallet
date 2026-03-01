@@ -12,8 +12,36 @@ services:
     networks:
       - dw-net
 
+  dw-identity:
+    image: postgres:17.5-bullseye
+    container_name: dw-identity
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post
+    ports:
+      - "5998:5432"
+    volumes:
+      - dw_identity_vol:/var/lib/postgresql/data
+    networks:
+      - dw-net
+
+  dw-notification:
+    image: postgres:17.5-bullseye
+    container_name: dw-notification
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post
+    ports:
+      - "5997:5432"
+    volumes:
+      - dw_notification_vol:/var/lib/postgresql/data
+    networks:
+      - dw-net
+
 volumes:
   dw_postgres_vol:
+  dw_identity_vol:
+  dw_notification_vol:
 
 networks:
   dw-net:
