@@ -60,7 +60,7 @@ public class Wallet {
         this.status = event.status();
         this.type = event.type();
         this.dailyWithdrawalLimit = event.dailyWithdrawalLimit();
-        this.withdrawnToday = new Money(new BigDecimal("0"), event.balance().currency());
+        this.withdrawnToday = new Money(BigDecimal.ZERO, event.balance().currency());
         this.createdAt = event.createdAt();
     }
 
