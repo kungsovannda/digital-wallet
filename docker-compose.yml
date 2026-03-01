@@ -1,14 +1,60 @@
-volumes:
-  kafka_1_dw_vol:
-  kafka_2_dw_vol:
-  kafka_3_dw_vol:
-  kafka-ui-dw-data:
-
-networks:
-  dw-net:
-    external: true
-
 services:
+  # Axon Server (Local Testing & Routing)
+  dw-axonserver:
+    image: axoniq/axonserver
+    hostname: axonserver
+    container_name: dw-axonserver
+    volumes:
+      - axonserver-data:/axonserver/data
+      - axonserver-events:/axonserver/events
+      - axonserver-log:/axonserver/log
+    ports:
+      - '8024:8024'
+      - '8124:8124'
+    networks:
+      - dw-net
+
+  # PostgreSQL - Event Store & Identity Databases
+  dw-postgres:
+    image: postgres:17.5-bullseye
+    container_name: dw-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post
+    ports:
+      - "5999:5432"
+    volumes:
+      - dw_postgres_vol:/var/lib/postgresql/data
+    networks:
+      - dw-net
+
+  dw-identity:
+    image: postgres:17.5-bullseye
+    container_name: dw-identity
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post
+    ports:
+      - "5998:5432"
+    volumes:
+      - dw_identity_vol:/var/lib/postgresql/data
+    networks:
+      - dw-net
+
+  dw-notification:
+    image: postgres:17.5-bullseye
+    container_name: dw-notification
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: post
+    ports:
+      - "5997:5432"
+    volumes:
+      - dw_notification_vol:/var/lib/postgresql/data
+    networks:
+      - dw-net
+
+  # Kafka - Distributed Event Bus (Kraft Mode)
   kafka-1-dw:
     image: confluentinc/cp-kafka:7.8.0
     container_name: kafka-1-dw
@@ -32,6 +78,7 @@ services:
       - kafka_1_dw_vol:/var/lib/kafka/data
     networks:
       - dw-net
+
   kafka-2-dw:
     image: confluentinc/cp-kafka:7.8.0
     container_name: kafka-2-dw
@@ -56,6 +103,7 @@ services:
       - kafka_2_dw_vol:/var/lib/kafka/data
     networks:
       - dw-net
+
   kafka-3-dw:
     image: confluentinc/cp-kafka:7.8.0
     container_name: kafka-3-dw
@@ -80,6 +128,8 @@ services:
       - kafka_3_dw_vol:/var/lib/kafka/data
     networks:
       - dw-net
+
+  # Kafka UI
   kafka-ui-dw:
     image: provectuslabs/kafka-ui:latest
     container_name: kafka-ui-dw
@@ -102,13 +152,38 @@ services:
       - kafka-1-dw
       - kafka-2-dw
       - kafka-3-dw
-    deploy:
-      resources:
-        limits:
-          memory: 2G
-          cpus: '1.0'
-        reservations:
-          memory: 1G
-          cpus: '0.5'
     networks:
       - dw-net
+
+  # MongoDB - Read Model Storage
+  dw-mongodb:
+    image: "mongodb/mongodb-community-server:latest"
+    container_name: "mongodb-latest"
+    ports:
+      - "27168:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=qwer
+    volumes:
+      - mongodb_latest_data_vol:/data/db/
+      - mongodb_latest_log_vol:/var/log/mongodb/
+    networks:
+      - dw-net
+
+volumes:
+  axonserver-data:
+  axonserver-events:
+  axonserver-log:
+  dw_postgres_vol:
+  dw_identity_vol:
+  dw_notification_vol:
+  kafka_1_dw_vol:
+  kafka_2_dw_vol:
+  kafka_3_dw_vol:
+  kafka-ui-dw-data:
+  mongodb_latest_data_vol:
+  mongodb_latest_log_vol:
+
+networks:
+  dw-net:
+    driver: bridge

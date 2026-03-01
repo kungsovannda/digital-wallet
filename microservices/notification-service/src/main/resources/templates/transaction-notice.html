@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Notification</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0a0a0f; font-family: 'DM Sans', sans-serif; color: #e8e8f0; }
+        .wrapper { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+        .header { text-align: center; padding: 48px 40px 40px; background: linear-gradient(135deg, #0f0f1a 0%, #141428 100%); border-radius: 24px 24px 0 0; border: 1px solid rgba(255,255,255,0.06); }
+        .logo-text { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 20px; color: #ffffff; letter-spacing: -0.3px; }
+        .header h1 { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; color: #ffffff; margin-top: 16px; }
+        .header h1 span { background: linear-gradient(90deg, #6366f1, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .body { background: #0f0f1a; padding: 40px; border: 1px solid rgba(255,255,255,0.06); border-top: none; }
+        .transaction-details { background: rgba(255, 255, 255, 0.04); border-radius: 16px; padding: 24px; margin: 24px 0; border: 1px solid rgba(255,255,255,0.06); }
+        .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .detail-row:last-child { border-bottom: none; }
+        .label { color: #6b6b8a; font-size: 14px; text-transform: uppercase; letter-spacing: 0.8px; }
+        .value { color: #ffffff; font-weight: 500; font-family: 'Syne', sans-serif; }
+        .footer { background: #080810; padding: 32px 40px; border-radius: 0 0 24px 24px; text-align: center; color: #4a4a65; font-size: 11px; }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <div class="logo-text">Digital Wallet</div>
+        <h1><span>Transaction Alert</span></h1>
+    </div>
+    <div class="body">
+        <p>Dear <strong th:text="${username}">User</strong>,</p>
+        <p>A new transaction has been processed in your account.</p>
+        <div class="transaction-details">
+            <div class="detail-row">
+                <span class="label">Type</span>
+                <span class="value" th:text="${type}">DEPOSIT</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Amount</span>
+                <span class="value" th:text="${amount}">$100.00</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Date</span>
+                <span class="value" th:text="${date}">2026-03-01</span>
+            </div>
+            <div class="detail-row">
+                <span class="label">New Balance</span>
+                <span class="value" th:text="${balance}">$1,100.00</span>
+            </div>
+        </div>
+        <p>If you did not authorize this transaction, please contact support immediately.</p>
+    </div>
+    <div class="footer">
+        <p>© <span th:text="${year}">2026</span> DW Wallet. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

@@ -5,6 +5,7 @@ import co.istad.wallet.common.event.MoneyDebitedEvent;
 import co.istad.wallet.common.event.MoneyDepositedEvent;
 import co.istad.wallet.common.event.MoneyWithdrawnEvent;
 import co.istad.wallet.query.interfaces.dto.TransactionResponseDto;
+import co.istad.wallet.query.query.GetTransactionByIdQuery;
 import co.istad.wallet.query.query.GetTransactionHistoryQuery;
 import co.istad.wallet.query.repository.TransactionViewRepository;
 import co.istad.wallet.query.view.TransactionView;
@@ -27,8 +28,9 @@ public class TransactionProjection {
     private final TransactionViewRepository transactionViewRepository;
 
     @QueryHandler
-    public List<TransactionResponseDto> handle(GetTransactionHistoryQuery query){
-        List<TransactionView> transactionViews = transactionViewRepository.findAllByWalletId(query.walletId().toString());
+    public List<TransactionResponseDto> handle(GetTransactionHistoryQuery query) {
+        List<TransactionView> transactionViews = transactionViewRepository
+                .findAllByWalletId(query.walletId().toString());
         return transactionViews.stream().map(
                 transactionView -> new TransactionResponseDto(
                         transactionView.getTransactionId(),
@@ -38,13 +40,26 @@ public class TransactionProjection {
                         transactionView.getType(),
                         transactionView.getTransferId(),
                         transactionView.getCounterpartWalletId(),
-                        transactionView.getTimestamp()
-                )
-        ).toList();
+                        transactionView.getTimestamp()))
+                .toList();
+    }
+
+    @QueryHandler
+    public TransactionResponseDto handle(GetTransactionByIdQuery query) {
+        TransactionView transactionView = transactionViewRepository.findById(query.transactionId()).orElseThrow();
+        return new TransactionResponseDto(
+                transactionView.getTransactionId(),
+                transactionView.getWalletId(),
+                transactionView.getAmount(),
+                transactionView.getCurrency(),
+                transactionView.getType(),
+                transactionView.getTransferId(),
+                transactionView.getCounterpartWalletId(),
+                transactionView.getTimestamp());
     }
 
     @EventHandler
-    public void on(MoneyDepositedEvent event){
+    public void on(MoneyDepositedEvent event) {
         TransactionView transactionView = new TransactionView(
                 event.transactionId().id().toString(),
                 event.walletId().id().toString(),
@@ -53,14 +68,13 @@ public class TransactionProjection {
                 TransactionType.DEPOSIT,
                 null,
                 null,
-                event.timestamp()
-        );
+                event.timestamp());
 
         transactionViewRepository.save(transactionView);
     }
 
     @EventHandler
-    public void on(MoneyWithdrawnEvent event){
+    public void on(MoneyWithdrawnEvent event) {
         TransactionView transactionView = new TransactionView(
                 event.transactionId().id().toString(),
                 event.walletId().id().toString(),
@@ -69,14 +83,13 @@ public class TransactionProjection {
                 TransactionType.WITHDRAW,
                 null,
                 null,
-                event.timestamp()
-        );
+                event.timestamp());
 
         transactionViewRepository.save(transactionView);
     }
 
     @EventHandler
-    public void on(MoneyDebitedEvent event){
+    public void on(MoneyDebitedEvent event) {
         TransactionView transactionView = new TransactionView(
                 event.transactionId().id().toString(),
                 event.walletId().id().toString(),
@@ -85,14 +98,13 @@ public class TransactionProjection {
                 TransactionType.DEBIT,
                 event.transferId().toString(),
                 event.toWalletId().toString(),
-                event.timestamp()
-        );
+                event.timestamp());
 
         transactionViewRepository.save(transactionView);
     }
 
     @EventHandler
-    public void on(MoneyCreditedEvent event){
+    public void on(MoneyCreditedEvent event) {
         TransactionView transactionView = new TransactionView(
                 event.transactionId().id().toString(),
                 event.walletId().id().toString(),
@@ -101,8 +113,7 @@ public class TransactionProjection {
                 TransactionType.CREDIT,
                 event.transferId().toString(),
                 event.fromWalletId().id().toString(),
-                event.timestamp()
-        );
+                event.timestamp());
 
         transactionViewRepository.save(transactionView);
     }

@@ -1,8 +1,10 @@
 package co.istad.wallet.query.interfaces.rest;
 
+import co.istad.wallet.common.vo.WalletStatus;
 import co.istad.wallet.common.vo.UserId;
 import co.istad.wallet.common.vo.WalletId;
 import co.istad.wallet.query.interfaces.dto.WalletResponseDto;
+import co.istad.wallet.query.query.GetWalletsByStatusQuery;
 import co.istad.wallet.query.query.GetUserWalletsQuery;
 import co.istad.wallet.query.query.GetWalletQuery;
 import lombok.RequiredArgsConstructor;
@@ -26,27 +28,31 @@ public class WalletController {
     private final QueryGateway queryGateway;
 
     @GetMapping("/{walletId}")
-    public WalletResponseDto getWallet(@PathVariable UUID walletId){
+    public WalletResponseDto getWallet(@PathVariable UUID walletId) {
         GetWalletQuery getWalletQuery = new GetWalletQuery(new WalletId(walletId));
         return queryGateway.query(getWalletQuery, ResponseTypes.instanceOf(WalletResponseDto.class)).join();
 
     }
 
     @GetMapping("/my-wallets")
-    public List<WalletResponseDto> getUserWallets(@AuthenticationPrincipal Jwt jwt){
+    public List<WalletResponseDto> getUserWallets(@AuthenticationPrincipal Jwt jwt) {
         GetUserWalletsQuery getUserWalletsQuery = new GetUserWalletsQuery(
-                extractUserId(jwt)
-        );
-        return queryGateway.query(getUserWalletsQuery, ResponseTypes.multipleInstancesOf(WalletResponseDto.class)).join();
+                extractUserId(jwt));
+        return queryGateway.query(getUserWalletsQuery, ResponseTypes.multipleInstancesOf(WalletResponseDto.class))
+                .join();
 
     }
 
-    private UserId extractUserId(Jwt jwt){
+    @GetMapping("/status")
+    public List<WalletResponseDto> getWalletsByStatus(@RequestParam WalletStatus status) {
+        GetWalletsByStatusQuery getWalletsByStatusQuery = new GetWalletsByStatusQuery(status);
+        return queryGateway.query(getWalletsByStatusQuery, ResponseTypes.multipleInstancesOf(WalletResponseDto.class))
+                .join();
+    }
+
+    private UserId extractUserId(Jwt jwt) {
         return new UserId(
-                UUID.fromString(jwt.getClaims().get("uuid").toString())
-        );
+                UUID.fromString(jwt.getClaims().get("uuid").toString()));
     }
-
-
 
 }

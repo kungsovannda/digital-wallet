@@ -3,6 +3,7 @@ package co.istad.wallet.query.projection;
 import co.istad.wallet.common.event.*;
 import co.istad.wallet.common.vo.WalletStatus;
 import co.istad.wallet.query.interfaces.dto.WalletResponseDto;
+import co.istad.wallet.query.query.GetWalletsByStatusQuery;
 import co.istad.wallet.query.query.GetUserWalletsQuery;
 import co.istad.wallet.query.query.GetWalletQuery;
 import co.istad.wallet.query.repository.WalletViewRepository;
@@ -25,7 +26,7 @@ public class WalletProjection {
     private final WalletViewRepository walletViewRepository;
 
     @QueryHandler
-    public WalletResponseDto handle(GetWalletQuery query){
+    public WalletResponseDto handle(GetWalletQuery query) {
         WalletView walletView = walletViewRepository.findById(query.walletId().toString()).orElseThrow();
         return new WalletResponseDto(
                 walletView.getWalletId(),
@@ -38,12 +39,11 @@ public class WalletProjection {
                 walletView.getDailyWithdrawLimit(),
                 walletView.getLastWithdrawalDate(),
                 walletView.getCreatedAt(),
-                walletView.getUpdatedAt()
-        );
+                walletView.getUpdatedAt());
     }
 
     @QueryHandler
-    public List<WalletResponseDto> handle(GetUserWalletsQuery query){
+    public List<WalletResponseDto> handle(GetUserWalletsQuery query) {
         List<WalletView> walletViews = walletViewRepository.findAllByOwnerId((query.ownerId().id().toString()));
         return walletViews.stream().map(
                 walletView -> {
@@ -58,14 +58,31 @@ public class WalletProjection {
                             walletView.getDailyWithdrawLimit(),
                             walletView.getLastWithdrawalDate(),
                             walletView.getCreatedAt(),
-                            walletView.getUpdatedAt()
-                    );
-                }
-        ).toList();
+                            walletView.getUpdatedAt());
+                }).toList();
+    }
+
+    @QueryHandler
+    public List<WalletResponseDto> handle(GetWalletsByStatusQuery query) {
+        List<WalletView> walletViews = walletViewRepository.findAllByStatus(query.status());
+        return walletViews.stream().map(
+                walletView -> new WalletResponseDto(
+                        walletView.getWalletId(),
+                        walletView.getOwnerId(),
+                        walletView.getBalance(),
+                        walletView.getCurrency(),
+                        walletView.getType(),
+                        walletView.getStatus(),
+                        walletView.getWithdrawnToday(),
+                        walletView.getDailyWithdrawLimit(),
+                        walletView.getLastWithdrawalDate(),
+                        walletView.getCreatedAt(),
+                        walletView.getUpdatedAt()))
+                .toList();
     }
 
     @EventHandler
-    public void on(WalletCreatedEvent event){
+    public void on(WalletCreatedEvent event) {
         WalletView walletView = new WalletView(
                 event.walletId().id().toString(),
                 event.ownerId().id().toString(),
@@ -77,34 +94,33 @@ public class WalletProjection {
                 event.dailyWithdrawalLimit().balance(),
                 null,
                 event.createdAt(),
-                null
-        );
+                null);
 
         walletViewRepository.save(walletView);
     }
 
     @EventHandler
-    public void on(WalletFrozenEvent event){
+    public void on(WalletFrozenEvent event) {
         WalletView walletView = walletViewRepository.findById(event.walletId().toString()).orElse(null);
-        if(walletView != null){
+        if (walletView != null) {
             walletView.setStatus(WalletStatus.FROZEN);
             walletViewRepository.save(walletView);
         }
     }
 
     @EventHandler
-    public void on(MoneyDepositedEvent event){
+    public void on(MoneyDepositedEvent event) {
         WalletView walletView = walletViewRepository.findById(event.walletId().toString()).orElse(null);
-        if(walletView != null){
+        if (walletView != null) {
             walletView.setBalance(event.balance().balance());
             walletViewRepository.save(walletView);
         }
     }
 
     @EventHandler
-    public void on(MoneyWithdrawnEvent event){
+    public void on(MoneyWithdrawnEvent event) {
         WalletView walletView = walletViewRepository.findById(event.walletId().toString()).orElse(null);
-        if(walletView != null){
+        if (walletView != null) {
             walletView.setBalance(event.balance().balance());
             walletView.setWithdrawnToday(event.withdrawnToday().balance());
             walletView.setLastWithdrawalDate(event.occurredDate());
@@ -113,9 +129,9 @@ public class WalletProjection {
     }
 
     @EventHandler
-    public void on(MoneyDebitedEvent event){
+    public void on(MoneyDebitedEvent event) {
         WalletView walletView = walletViewRepository.findById(event.walletId().toString()).orElse(null);
-        if(walletView != null){
+        if (walletView != null) {
             walletView.setBalance(event.balance().balance());
             walletView.setWithdrawnToday(event.withdrawnToday().balance());
             walletView.setLastWithdrawalDate(event.occurredDate());
@@ -124,13 +140,12 @@ public class WalletProjection {
     }
 
     @EventHandler
-    public void on(MoneyCreditedEvent event){
+    public void on(MoneyCreditedEvent event) {
         WalletView walletView = walletViewRepository.findById(event.walletId().toString()).orElse(null);
-        if(walletView != null){
+        if (walletView != null) {
             walletView.setBalance(event.balance().balance());
             walletViewRepository.save(walletView);
         }
     }
-
 
 }

@@ -1,11 +1,9 @@
 package co.istad.wallet.query.interfaces.rest;
 
-
 import co.istad.wallet.common.vo.WalletId;
 import co.istad.wallet.query.interfaces.dto.TransactionResponseDto;
-import co.istad.wallet.query.interfaces.dto.WalletResponseDto;
+import co.istad.wallet.query.query.GetTransactionByIdQuery;
 import co.istad.wallet.query.query.GetTransactionHistoryQuery;
-import co.istad.wallet.query.query.GetWalletQuery;
 import lombok.RequiredArgsConstructor;
 import org.axonframework.messaging.responsetypes.ResponseTypes;
 import org.axonframework.queryhandling.QueryGateway;
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/wallets")
@@ -25,9 +22,17 @@ public class TransactionController {
     private final QueryGateway queryGateway;
 
     @GetMapping("/{walletId}/transactions")
-    public List<TransactionResponseDto> getTransaction(@PathVariable UUID walletId){
-        GetTransactionHistoryQuery getWalletQuery = new GetTransactionHistoryQuery(new WalletId(walletId));
-        return queryGateway.query(getWalletQuery, ResponseTypes.multipleInstancesOf(TransactionResponseDto.class)).join();
+    public List<TransactionResponseDto> getTransactionHistory(@PathVariable String walletId) {
+        GetTransactionHistoryQuery getTransactionHistoryQuery = new GetTransactionHistoryQuery(walletId);
+        return queryGateway
+                .query(getTransactionHistoryQuery, ResponseTypes.multipleInstancesOf(TransactionResponseDto.class))
+                .join();
+    }
 
+    @GetMapping("/transactions/{transactionId}")
+    public TransactionResponseDto getTransactionById(@PathVariable String transactionId) {
+        GetTransactionByIdQuery getTransactionByIdQuery = new GetTransactionByIdQuery(transactionId);
+        return queryGateway.query(getTransactionByIdQuery, ResponseTypes.instanceOf(TransactionResponseDto.class))
+                .join();
     }
 }
