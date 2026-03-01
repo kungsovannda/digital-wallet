@@ -46,7 +46,7 @@ public class Wallet {
                 cmd.balance(),
                 WalletStatus.ACTIVE,
                 cmd.type(),
-                new Money(dailyWithdrawLimit, cmd.balance().currency()),
+                new Money(cmd.type().getDailyLimit(), cmd.balance().currency()),
                 Instant.now()
         ));
     }
