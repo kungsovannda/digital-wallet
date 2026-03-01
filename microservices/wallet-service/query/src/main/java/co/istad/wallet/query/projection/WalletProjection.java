@@ -3,6 +3,7 @@ package co.istad.wallet.query.projection;
 import co.istad.wallet.common.event.*;
 import co.istad.wallet.common.vo.WalletStatus;
 import co.istad.wallet.query.interfaces.dto.WalletResponseDto;
+import co.istad.wallet.query.query.GetUserWalletsQuery;
 import co.istad.wallet.query.query.GetWalletQuery;
 import co.istad.wallet.query.repository.WalletViewRepository;
 import co.istad.wallet.query.view.WalletView;
@@ -12,6 +13,8 @@ import org.axonframework.config.ProcessingGroup;
 import org.axonframework.eventhandling.EventHandler;
 import org.axonframework.queryhandling.QueryHandler;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @Slf4j
@@ -37,6 +40,28 @@ public class WalletProjection {
                 walletView.getCreatedAt(),
                 walletView.getUpdatedAt()
         );
+    }
+
+    @QueryHandler
+    public List<WalletResponseDto> handle(GetUserWalletsQuery query){
+        List<WalletView> walletViews = walletViewRepository.findAllByOwnerId((query.ownerId().id().toString()));
+        return walletViews.stream().map(
+                walletView -> {
+                    return new WalletResponseDto(
+                            walletView.getWalletId(),
+                            walletView.getOwnerId(),
+                            walletView.getBalance(),
+                            walletView.getCurrency(),
+                            walletView.getType(),
+                            walletView.getStatus(),
+                            walletView.getWithdrawnToday(),
+                            walletView.getDailyWithdrawLimit(),
+                            walletView.getLastWithdrawalDate(),
+                            walletView.getCreatedAt(),
+                            walletView.getUpdatedAt()
+                    );
+                }
+        ).toList();
     }
 
     @EventHandler

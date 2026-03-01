@@ -1,4 +1,8 @@
 package co.istad.wallet.query.query;
 
-public record GetUserWalletsQuery() {
+import co.istad.wallet.common.vo.UserId;
+
+public record GetUserWalletsQuery(
+        UserId ownerId
+) {
 }

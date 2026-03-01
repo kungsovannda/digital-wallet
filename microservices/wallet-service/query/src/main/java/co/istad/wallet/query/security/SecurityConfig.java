@@ -1,4 +1,4 @@
-package co.istad.wallet.command.security;
+package co.istad.wallet.query.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
