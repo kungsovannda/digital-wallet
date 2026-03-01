@@ -40,12 +40,6 @@ public class Wallet {
 
     @CommandHandler
     public Wallet(CreateWalletCommand cmd){
-        BigDecimal dailyWithdrawLimit = cmd.type().compareTo(WalletType.STANDARD) == 0 ?
-                new BigDecimal("1000") : cmd.type().compareTo(WalletType.PREMIUM) == 0 ?
-                new BigDecimal("5000") : new BigDecimal("10000");
-
-        log.info("CreateWalletCommand: {}", cmd);
-
         AggregateLifecycle.apply(new WalletCreatedEvent(
                 cmd.walletId(),
                 cmd.ownerId(),
