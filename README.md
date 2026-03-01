@@ -1,193 +1,110 @@
-# Digital Wallet — Axon Framework + Kafka + MongoDB
+# Axon Framework + Spring Boot 4: DDD, CQRS & Event Sourcing
 
-> A microservices application implementing **Domain-Driven Design (DDD)**, **CQRS**, and **Event Sourcing** using **Axon Framework** with **Apache Kafka** as the event bus and **MongoDB** as the event store and read model storage — built on top of **Spring Boot** and **Spring Cloud**.
+> A reference implementation of a **Digital Wallet** demonstrating the integration of **Axon Framework** with **Spring Boot 4**, using **PostgreSQL** as the event store and **Apache Kafka** for distributed messaging. This project serves as a blueprint for implementing scalable, event-driven microservices with a strong focus on domain-centric design and modern security standards.
 
 ---
 
-## 📐 Architecture Overview
+## 🏛️ Architectural Foundation
 
-This project separates concerns across three core patterns:
+This project is built on modern distributed system patterns:
 
-| Pattern | How it's applied |
-|---|---|
-| **DDD** | Business logic lives inside Aggregates, with shared contracts (Commands, Events, Queries) defined in the `common` module |
-| **CQRS** | `wallet-service` is split into a `command` module (write side) and a `query` module (read side) |
-| **Event Sourcing** | Every state change is stored as an immutable Domain Event in MongoDB via the Axon MongoDB Extension |
+- **Domain-Driven Design (DDD)**: Business logic lives in Aggregates that define the consistency boundaries.
+- **CQRS**: Complete separation of command processing and query reporting.
+- **Event Sourcing**: The source of truth is the immutable sequence of domain events persisted in PostgreSQL.
+- **Database per Service**: Every microservice owns its private database (PostgreSQL or MongoDB), ensuring strict service isolation.
+- **Security-First Architecture**: Implements **OAuth2 & OpenID Connect (OIDC)** using **Spring Authorization Server** for centralized identity and access management.
+- **Distributed Event Bus**: **Apache Kafka** handles the distribution of events across service boundaries, while Axon Server is maintained only for local testing/prototyping.
+
+---
+
+## 🏗️ Messaging, Persistence & Security
+
+The project leverages a robust infrastructure stack for production-like reliability:
+
+### 1. Persistence (Event Store)
+The **Command Side** uses **PostgreSQL** as the primary Event Store and Token Store. This ensures ACID compliance for event persistence during aggregate state changes.
+
+### 2. Messaging (Event Bus)
+**Apache Kafka** acts as the backbone for cross-service communication. When an event is published by an aggregate, it is automatically streamed to Kafka topics.
+
+### 3. Security (OAuth2 / OIDC)
+The `identity-service` acts as a **Spring Authorization Server**, issuing JWT tokens to clients. All other microservices (Wallet, Notification) act as **OAuth2 Resource Servers**, validating incoming tokens via the public keys provided by the Authorization Server.
+
+### 4. Service Isolation (Database per Service)
+*   **Identity Service**: PostgreSQL (User accounts, Client registrations, Consent)
+*   **Wallet Command**: PostgreSQL (Event Store / Token Store / Saga Store)
+*   **Wallet Query**: MongoDB (Optimized Read Models)
+*   **Notification Service**: Dedicated event consumer state.
 
 ---
 
 ## 🗂️ Project Structure
 
-```
+```text
 digital-wallet/
-│
-├── common/                        # Shared contracts across all microservices
-│   ├── dto/                       # Data Transfer Objects
-│   ├── vo/                        # Value Objects (WalletId, Money, etc.)
-│   └── event/                     # Domain Events published via Axon Event Bus
-│
+├── common/                # Shared Language (Events, DTOs, Value Objects)
 ├── microservices/
-│   ├── identity-service/          # User identity, authentication & authorization
-│   │
-│   ├── wallet-service/
-│   │   ├── command/               # Write side: Aggregates, Command Handlers, @EventSourcingHandlers
-│   │   └── query/                 # Read side: Event Handlers, Projections, Query Handlers
-│   │
-│   └── notification-service/      # Listens to domain events and sends notifications
-│
+│   ├── identity-service/  # OAuth2 Authorization Server (Support for JWT/OIDC)
+│   ├── wallet-service/    # Core Domain Logic (Resource Server)
+│   │   ├── command/       # Write Side: Aggregates (Database: Postgres Event Store)
+│   │   └── query/         # Read Side: Projections (Database: MongoDB Read Model)
+│   └── notification-service/ # Integration Service (Resource Server)
 ├── spring-cloud/
-│   ├── gateway/                   # API Gateway — single entry point for all client requests
-│   └── eureka-server/             # Service Discovery — registry for all microservices
-│
-├── deployment/                    # Docker Compose / infrastructure configs
-├── gradle/wrapper/
-├── settings.gradle
-├── gradlew
-└── gradlew.bat
+│   ├── eureka/            # Service Discovery
+│   └── gateway/           # Edge Service (API Gateway & Security Filter)
+└── deployment/            # Infrastructure (Docker Compose)
+    ├── postgres/          # Relational Database (Primary Store)
+    ├── kafka/             # Distributed Message Broker
+    ├── mongodb/           # Document Store (Read Models)
+    └── axonserver/        # (Testing Only) Local Command/Query Bus
 ```
 
 ---
 
-## 🔍 Module Responsibilities
+## 🔄 Integration Flow
 
-### `common/`
-The shared library included by all microservices. It defines the language of the system:
-- **`dto/`** — request/response objects passed over the wire
-- **`vo/`** — immutable Value Objects that carry domain meaning (e.g. `Money`, `WalletId`)
-- **`event/`** — Domain Events that represent facts (`WalletCreatedEvent`, `MoneyWithdrawnEvent`). These are published by Axon and consumed by any interested service
-
-### `microservices/identity-service/`
-Handles user registration, login, and token issuance. Other services trust the identity provided by this service through the API Gateway.
-
-### `microservices/wallet-service/command/`
-The **write side** of the wallet bounded context. Contains:
-- Axon `@Aggregate` classes that enforce business rules
-- `@CommandHandler` methods that process incoming commands
-- `@EventSourcingHandler` methods that rebuild aggregate state from events stored in MongoDB
-
-### `microservices/wallet-service/query/`
-The **read side** of the wallet bounded context. Contains:
-- `@EventHandler` methods that build and update MongoDB read model collections
-- `@QueryHandler` methods that serve queries from those read models
-- Projection classes (views) stored in MongoDB
-
-### `microservices/notification-service/`
-A downstream consumer. Subscribes to domain events from the Axon Event Bus (distributed via Kafka) and triggers notifications (email, push, etc.) without coupling to any other service.
-
-### `spring-cloud/gateway/`
-The single entry point for all external HTTP traffic. Routes requests to the appropriate microservice via Eureka-based service discovery.
-
-### `spring-cloud/eureka-server/`
-The service registry. All microservices register here on startup so the Gateway and other services can locate them dynamically.
-
-### `deployment/`
-Docker Compose files to spin up the full infrastructure stack: MongoDB, Apache Kafka, Postgres.
+1.  **Authorize**: Client authenticates with `identity-service` (OAuth2) and receives a JWT.
+2.  **Command**: Client sends a request with the JWT to the `gateway`, which routes it to `wallet-service/command`.
+3.  **Persist**: The command side validates the request, processes the command, and saves the event to the **PostgreSQL Event Store**.
+4.  **Publish**: The `Axon Kafka Extension` pushes the event to a Kafka topic.
+5.  **Project**: `wallet-service/query` listens to Kafka, consumes the event, and updates its private **MongoDB read model**.
 
 ---
 
-## 🔁 Event Flow
+## 🛠️ Technology Stack
 
-```
-Client HTTP Request
-        │
-        ▼
-  [ API Gateway ]
-        │
-        ▼
-  [ identity-service ]  ← authenticates the request
-        │
-        ▼
-  [ wallet-service/command ]
-        │  @CommandHandler → AggregateLifecycle.apply(event)
-        ▼
-  [ Domain Event ]
-        │
-        ├──► [ MongoDB: domainevents ]     ← persisted as source of truth (Axon MongoDB Extension)
-        │
-        └──► [ Kafka topic ]               ← distributed to other services (Axon Kafka Extension)
-                    │
-                    ├──► [ wallet-service/query ]     → updates MongoDB read model
-                    │
-                    └──► [ notification-service ]     → sends notification to user
-
-Client Query Request
-        │
-        ▼
-  [ API Gateway ]
-        │
-        ▼
-  [ wallet-service/query ]
-        │  @QueryHandler reads from MongoDB projection
-        ▼
-  [ HTTP Response ]
-```
-
----
-
-## 🛠️ Tech Stack
-
-| Technology | Role |
-|---|---|
-| Java 17+ | Primary language |
-| Spring Boot 3.x | Application framework |
-| Axon Framework 4.x | CQRS / Event Sourcing / DDD backbone |
-| Axon Kafka Extension | Distributes domain events across microservices |
-| Axon MongoDB Extension | Event Store, Token Store, Saga Store |
-| Apache Kafka | Message broker for cross-service event streaming |
-| MongoDB | Event store + query-side read models |
-| Spring Cloud Gateway | API Gateway |
-| Eureka Server | Service discovery & registry |
-| Gradle | Multi-module build tool |
-| Docker Compose | Local infrastructure orchestration |
+| Component            | Technology                                     |
+|----------------------|------------------------------------------------|
+| **Language**         | Java 21                                        |
+| **Core Framework**    | Spring Boot 4.0.3                              |
+| **Security**         | Spring Authorization Server (OAuth2/OIDC)      |
+| **Messaging**        | Apache Kafka (Axon Kafka Extension)            |
+| **Event Store**      | PostgreSQL (via JDBC/JPA)                      |
+| **Read Models**      | MongoDB (Axon MongoDB Extension)               |
+| **Service Control**  | Axon Framework 4.13.0                          |
+| **Service Discovery**| Spring Cloud Eureka                            |
+| **API Gateway**      | Spring Cloud Gateway                           |
 
 ---
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Java 17+
-- Docker & Docker Compose
-
-### 1. Start Infrastructure
-
+### 1. Start Primary Infrastructure
 ```bash
-cd deployment
-docker-compose up -d
+# Start Kafka, Postgres, and MongoDB
+cd deployment/kafka && docker-compose up -d
+cd ../postgres && docker-compose up -d
+cd ../mongodb && docker-compose up -d
 ```
 
-Starts MongoDB, Postgres, and Kafka.
-
-### 2. Build All Modules
-
+### 2. Build and Run
 ```bash
 ./gradlew clean build
 ```
-
-### 3. Start Services in Order
-
-```bash
-# 1. Eureka Server
-cd spring-cloud/eureka-server && ./gradlew bootRun
-
-# 2. API Gateway
-cd spring-cloud/gateway && ./gradlew bootRun
-
-# 3. Identity Service
-cd microservices/identity-service && ./gradlew bootRun
-
-# 4. Wallet Command
-cd microservices/wallet-service/command && ./gradlew bootRun
-
-# 5. Wallet Query
-cd microservices/wallet-service/query && ./gradlew bootRun
-
-# 6. Notification Service
-cd microservices/notification-service && ./gradlew bootRun
-```
+Run services in order: **Eureka**, **Gateway**, **Identity Service** (Auth Server), then the **Wallet** modules.
 
 ---
 
 ## 👤 Author
-
 **Kung Sovannda**
-GitHub: [@kungsovannda](https://github.com/kungsovannda)
+- GitHub: [@kungsovannda](https://github.com/kungsovannda)
