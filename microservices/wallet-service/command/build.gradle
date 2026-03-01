@@ -23,13 +23,14 @@ ext {
 }
 
 dependencies {
-    implementation project(":microservices:wallet-service:common")
+    implementation project(":common")
     implementation 'org.axonframework.extensions.kafka:axon-kafka-spring-boot-starter:4.12.0'
     implementation 'org.axonframework:axon-spring-boot-starter:4.13.0'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'

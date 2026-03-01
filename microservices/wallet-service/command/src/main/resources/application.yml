@@ -7,9 +7,16 @@ spring:
     username: postgres
     password: post
     url: jdbc:postgresql://localhost:5999/postgres
+
   jpa:
     hibernate:
       ddl-auto: update
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090
 
 axon:
   axonserver:

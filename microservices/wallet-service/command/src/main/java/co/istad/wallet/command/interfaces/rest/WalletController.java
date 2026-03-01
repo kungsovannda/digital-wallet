@@ -15,9 +15,13 @@ import co.istad.wallet.common.vo.UserId;
 import co.istad.wallet.common.vo.WalletId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.axonframework.commandhandling.gateway.CommandGateway;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -25,16 +29,18 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/v1/wallets")
 @RequiredArgsConstructor
+@Slf4j
 public class WalletController {
 
     private final CommandGateway commandGateway;
 
     @PostMapping
-    public ResponseEntity<?> createWallet(@Valid @RequestBody CreateWalletRequestDto createWalletRequestDto){
+    public ResponseEntity<?> createWallet(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody CreateWalletRequestDto createWalletRequestDto){
+        log.info("Create wallet user: {}", jwt.getClaims());
         commandGateway.sendAndWait(
                 new CreateWalletCommand(
                         new WalletId(UUID.randomUUID()),
-                        createWalletRequestDto.ownerId(),
+                        extractUserId(jwt),
                         createWalletRequestDto.balance(),
                         createWalletRequestDto.type()
                 )
@@ -78,5 +84,11 @@ public class WalletController {
                 )
         );
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    private UserId extractUserId(Jwt jwt){
+        return new UserId(
+                UUID.fromString(jwt.getClaims().get("uuid").toString())
+        );
     }
 }

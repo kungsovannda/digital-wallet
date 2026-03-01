@@ -6,8 +6,6 @@ import co.istad.wallet.common.vo.WalletType;
 import jakarta.validation.constraints.NotNull;
 
 public record CreateWalletRequestDto(
-        @NotNull(message = "Owner id is required")
-        UserId ownerId,
         @NotNull(message = "Balance is required")
         Money balance,
         @NotNull(message = "Wallet type is required")
