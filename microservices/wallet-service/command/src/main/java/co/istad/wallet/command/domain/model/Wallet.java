@@ -26,6 +26,7 @@ import java.util.UUID;
 @Slf4j
 public class Wallet {
 
+    @EqualsAndHashCode.Include
     @AggregateIdentifier
     private WalletId walletId;
     private UserId ownerId;
