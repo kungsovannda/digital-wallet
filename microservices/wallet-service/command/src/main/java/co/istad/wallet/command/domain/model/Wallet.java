@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Aggregate
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Slf4j
 public class Wallet {
 
