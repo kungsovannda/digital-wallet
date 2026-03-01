@@ -163,7 +163,7 @@ public class Wallet {
                 new MoneyDebitedEvent(
                         cmd.transactionId(),
                         cmd.walletId(),
-                        new TransferId(UUID.randomUUID()),
+                        cmd.transferId(),
                         cmd.toWalletId(),
                         cmd.amount(),
                         new Money(newBalance, cmd.amount().currency()),
